@@ -2,37 +2,34 @@ pipeline {
     agent any
 
     stages {
-        stage('Preparar entorno') {
+        stage('Build') {
             steps {
                 script {
                     // Instalar dependencias necesarias, incluyendo tree
                     echo 'Preparando entorno de Python y tree...'
-                    sh 'sudo apt-get update && sudo apt-get install -y python3 python3-pip && sudo apt install tree'
+                    sh '''
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install -r requirements.txt
+                    '''
                 }
             }
         }
 
-        stage('Ejecutar script de prueba') {
+        stage('Test') {
             steps {
-                script {
                     echo 'Ejecutando script de prueba en Python...'
                     // Asegúrate de que tu script de Python esté en el repositorio o en la ubicación correcta
-                    sh 'python3 python.py'
+                    sh '. venv/bin/activate && python3 -m pytest'
                 }
             }
         }
 
-        stage('Limpiar') {
+        stage('Deploy') {
             steps {
-                echo 'Limpiando después de la ejecución del script...'
+                sh'echo "Algo"'
                 // Aquí podrías agregar cualquier paso de limpieza si es necesario
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline completo!'
         }
     }
 }
